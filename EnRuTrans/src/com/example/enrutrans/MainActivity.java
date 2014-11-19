@@ -8,6 +8,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
@@ -16,18 +17,24 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 
 public class MainActivity extends ActionBarActivity {
+	EditText searchWord;
 	EditText searchResult;
+
+	public void translate(View view) {
+		String searchedWord = searchWord.getText().toString();
+		new NegotiationTask().execute(searchedWord);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		searchWord = (EditText) findViewById(R.id.searchWord);
 		searchResult = (EditText) findViewById(R.id.searchResult);
-		new NegotiationTask().execute("prophecy");
-		// searchResult.setText(getTranslation("hello"));
 	}
 
 	@Override
@@ -58,7 +65,7 @@ public class MainActivity extends ActionBarActivity {
 			String langTo = "ru";
 			String q = params[0];
 
-			String result = "noResult";
+			String result = "";
 			try {
 				String safeUrl = URLEncoder.encode("|", "UTF-8");
 				String finalUrl = url + q + langFrom + safeUrl + langTo;
@@ -75,17 +82,12 @@ public class MainActivity extends ActionBarActivity {
 				JSONObject json = new JSONObject(strJson);
 
 				Log.d("JSON", json.toString());
-				String responseData = json.getString("responseData");
-				JSONObject json2 = new JSONObject(responseData);
-				String translatedText = json2.getString("translatedText");
-				Log.d("TRANSLATION", translatedText);
-				result = translatedText;
-
-				// byte[] utf8 = translatedText.getBytes("UTF-8");
-				//
-				// // Convert from UTF-8 to Unicode
-				// String translationResult = new String(utf8, "UTF-8");
-				// Log.d("TRANSLATION FULL", translationResult);
+				JSONArray responseData = json.getJSONArray("matches");
+				for (int i = 0; i < responseData.length(); i++) {
+					result += responseData.getJSONObject(i).getString(
+							"translation")
+							+ " ";
+				}
 
 			} catch (Exception e) {
 				Log.d("InputStream", e.toString());
