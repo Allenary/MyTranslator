@@ -26,7 +26,7 @@ public class MainActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		searchResult = (EditText) findViewById(R.id.searchResult);
-		new NegotiationTask().execute();
+		new NegotiationTask().execute("prophecy");
 		// searchResult.setText(getTranslation("hello"));
 	}
 
@@ -56,7 +56,7 @@ public class MainActivity extends ActionBarActivity {
 			String url = "http://api.mymemory.translated.net/get?q=";
 			String langFrom = "&langpair=en";
 			String langTo = "ru";
-			String q = "hello";
+			String q = params[0];
 
 			String result = "noResult";
 			try {
